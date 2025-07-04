@@ -21,9 +21,28 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:7674592580460475959",
+      "lastPropertyId": "2:3594464568380776343",
+      "name": "Star",
+      "properties": [
+        {
+          "id": "1:1826195954266282948",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3594464568380776343",
+          "name": "url",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:2215562967307840487",
+  "lastEntityId": "2:7674592580460475959",
   "lastIndexId": "1:5744427149605530244",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

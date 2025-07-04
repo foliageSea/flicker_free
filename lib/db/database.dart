@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:flicker_free/db/services/star_service.dart';
 import 'package:flicker_free/db/services/user_service.dart';
 import 'package:flicker_free/objectbox.g.dart';
 import 'package:get_it/get_it.dart';
@@ -28,6 +29,7 @@ class AppDatabase with AppLogMixin {
 
   void register() {
     getIt.registerSingleton<UserService>(UserServiceImpl());
+    getIt.registerSingleton<StarService>(StarServiceImpl());
   }
 }
 

@@ -7,6 +7,9 @@ import 'package:flicker_free/app/common/global.dart';
 import 'package:flicker_free/app/constants/constants.dart';
 import 'package:flicker_free/app/events/events.dart';
 import 'package:flicker_free/app/helpers/hotkey_helper.dart';
+import 'package:flicker_free/app/widgets/star_dialog.dart';
+import 'package:flicker_free/db/entity/star.dart';
+import 'package:flicker_free/db/services/star_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +27,9 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
   final _controller = WebviewController();
   final _textController = TextEditingController();
   final List<StreamSubscription> _subscriptions = [];
+  var starService = Global.getIt<StarService>();
+
+  Star? star;
 
   final Map<EventType, String> _scripts = {
     EventType.toggle: kToggleVideoScript,
@@ -61,7 +67,10 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
       _subscriptions.add(
         _controller.url.listen((url) {
           _textController.text = url;
-          Storage().set(StorageKeys.url, url);
+          if (star != null) {
+            star!.url = url;
+            starService.update(star!);
+          }
         }),
       );
 
@@ -76,8 +85,16 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
         WebviewPopupWindowPolicy.sameWindow,
       );
 
-      var url = Storage().get(StorageKeys.url);
-      await _controller.loadUrl(url ?? kDefaultUrl);
+      var list = await starService.list();
+
+      late String url;
+      if (list.isNotEmpty) {
+        url = list.first.url!;
+        star = list.first;
+      } else {
+        url = kDefaultUrl;
+      }
+      await _controller.loadUrl(url);
 
       if (!mounted) return;
       setState(() {});
@@ -112,6 +129,34 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
                           _controller.loadUrl(val);
                         },
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      splashRadius: 20,
+                      onPressed: () async {
+                        if (_textController.text.isEmpty) {
+                          return;
+                        }
+                        await starService.add(
+                          Star()..url = _textController.text,
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.star_border),
+                      splashRadius: 20,
+                      onPressed: () async {
+                        var star = await showDialog<Star>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const StarDialog();
+                          },
+                        );
+                        if (star != null) {
+                          this.star = star;
+                          await _controller.loadUrl(star.url!);
+                        }
+                      },
                     ),
                     IconButton(
                       icon: const Icon(Icons.keyboard_arrow_left),
