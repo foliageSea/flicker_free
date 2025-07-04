@@ -1,5 +1,5 @@
+import 'package:flicker_free/app/widgets/custom_webview.dart';
 import 'package:flutter/material.dart';
-import 'package:flicker_free/app/layouts/base_layout.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +11,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return BaseLayout(title: 'Home', child: Container());
+    return const CustomWebview();
   }
 }

@@ -1,8 +1,10 @@
 import 'package:core/core.dart';
+import 'package:flicker_free/app/helpers/hotkey_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flicker_free/app/controllers/src/theme_controller.dart';
 import 'package:flicker_free/app/locales/locales.dart';
 import 'package:get/get.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../routes/app_pages.dart';
 import 'global.dart';
@@ -14,10 +16,27 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> with AppLogMixin {
+class _MainAppState extends State<MainApp> with AppLogMixin, WindowListener {
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
+    HotkeyHelper().register();
+  }
+
+  @override
+  void dispose() {
+    windowManager.removeListener(this);
+    HotkeyHelper().unregisterAll();
+    super.dispose();
+  }
+
+  @override
+  Future<void> onWindowClose() async {
+    bool isPreventClose = await windowManager.isPreventClose();
+    if (isPreventClose && mounted) {
+      await windowManager.minimize();
+    }
   }
 
   @override

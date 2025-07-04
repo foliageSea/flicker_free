@@ -1,10 +1,14 @@
 import 'package:core/core.dart';
+import 'package:event_bus/event_bus.dart';
+import 'package:flicker_free/app/helpers/window_manager_helper.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flicker_free/app/controllers/controllers.dart';
 import 'package:flicker_free/app/locales/locales.dart';
 import 'package:flicker_free/db/database.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+
+final EventBus eventBus = EventBus();
 
 class Global {
   static const String appName = "flicker_free";
@@ -35,6 +39,9 @@ class Global {
       var st = details.stack;
       AppLogger().handle(e, st);
     };
+
+    var windowManagerHelper = WindowManagerHelper();
+    await windowManagerHelper.ensureInitialized();
 
     info('应用开始初始化');
     await initCommon();
