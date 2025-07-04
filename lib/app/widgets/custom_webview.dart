@@ -140,6 +140,8 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
                         await starService.add(
                           Star()..url = _textController.text,
                         );
+                        var list = await starService.list();
+                        star = list.last;
                       },
                     ),
                     IconButton(
