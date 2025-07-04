@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/app/controllers/src/theme_controller.dart';
-import 'package:flutter_template/app/locales/locales.dart';
+import 'package:flicker_free/app/controllers/src/theme_controller.dart';
+import 'package:flicker_free/app/locales/locales.dart';
 import 'package:get/get.dart';
 
 import '../routes/app_pages.dart';

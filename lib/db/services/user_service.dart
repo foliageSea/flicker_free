@@ -1,4 +1,4 @@
-import 'package:flutter_template/db/mapper/user_mapper.dart';
+import 'package:flicker_free/db/mapper/user_mapper.dart';
 
 import '../database.dart';
 import '../entity/user.dart';

@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/app/routes/app_pages.dart';
+import 'package:flicker_free/app/routes/app_pages.dart';
 import 'package:get/get.dart';
 
 class AuthMiddleware extends GetMiddleware with AppLogMixin {

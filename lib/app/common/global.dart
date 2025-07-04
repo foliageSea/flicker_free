@@ -1,13 +1,13 @@
 import 'package:core/core.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_template/app/controllers/controllers.dart';
-import 'package:flutter_template/app/locales/locales.dart';
-import 'package:flutter_template/db/database.dart';
+import 'package:flicker_free/app/controllers/controllers.dart';
+import 'package:flicker_free/app/locales/locales.dart';
+import 'package:flicker_free/db/database.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 
 class Global {
-  static const String appName = "flutter_template";
+  static const String appName = "flicker_free";
   static String appVersion = "1.0.0";
   static final GetIt getIt = GetIt.instance;
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/app/layouts/base_layout.dart';
+import 'package:flicker_free/app/layouts/base_layout.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

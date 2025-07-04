@@ -1,5 +1,5 @@
-name: flutter_template
-description: "flutter_template"
+name: flicker_free
+description: "flicker_free"
 version: 1.0.0+1
 
 environment:
@@ -30,7 +30,6 @@ dependency_overrides:
   updater:
     path: ./packages/updater
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -43,4 +42,3 @@ flutter:
   assets:
     - assets/
     - assets/locales/
-

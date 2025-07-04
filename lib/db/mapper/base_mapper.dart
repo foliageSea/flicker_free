@@ -1,4 +1,4 @@
-import 'package:flutter_template/objectbox.g.dart';
+import 'package:flicker_free/objectbox.g.dart';
 
 class BaseMapper {
   late final Store db;

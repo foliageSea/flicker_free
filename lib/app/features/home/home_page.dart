@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/app/layouts/base_layout.dart';
+import 'package:flicker_free/app/layouts/base_layout.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
