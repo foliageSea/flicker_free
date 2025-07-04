@@ -23,7 +23,8 @@ class CustomWebview extends StatefulWidget {
   State<CustomWebview> createState() => _CustomWebviewState();
 }
 
-class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
+class _CustomWebviewState extends State<CustomWebview>
+    with AppLogMixin, AppMessageMixin {
   final _controller = WebviewController();
   final _textController = TextEditingController();
   final List<StreamSubscription> _subscriptions = [];
@@ -142,6 +143,7 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
                         );
                         var list = await starService.list();
                         star = list.last;
+                        await showToast('添加成功');
                       },
                     ),
                     IconButton(
@@ -157,6 +159,7 @@ class _CustomWebviewState extends State<CustomWebview> with AppLogMixin {
                         if (star != null) {
                           this.star = star;
                           await _controller.loadUrl(star.url!);
+                          await showToast('跳转成功');
                         }
                       },
                     ),

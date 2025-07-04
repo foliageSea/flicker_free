@@ -12,7 +12,7 @@ class StarDialog extends StatefulWidget {
   State<StarDialog> createState() => _StarDialogState();
 }
 
-class _StarDialogState extends State<StarDialog> {
+class _StarDialogState extends State<StarDialog> with AppMessageMixin {
   RxList<Star> stars = <Star>[].obs;
   var starService = Global.getIt<StarService>();
 
@@ -54,6 +54,7 @@ class _StarDialogState extends State<StarDialog> {
                   onPressed: () async {
                     await starService.remove(star.id);
                     await loadData();
+                    await showToast('删除成功');
                   },
                 ),
                 onTap: () {
