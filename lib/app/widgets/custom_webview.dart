@@ -7,12 +7,14 @@ import 'package:flicker_free/app/common/global.dart';
 import 'package:flicker_free/app/constants/constants.dart';
 import 'package:flicker_free/app/events/events.dart';
 import 'package:flicker_free/app/helpers/hotkey_helper.dart';
+import 'package:flicker_free/app/helpers/window_manager_helper.dart';
 import 'package:flicker_free/app/widgets/star_dialog.dart';
 import 'package:flicker_free/db/entity/star.dart';
 import 'package:flicker_free/db/services/star_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:webview_windows/webview_windows.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -30,7 +32,7 @@ class _CustomWebviewState extends State<CustomWebview>
   final List<StreamSubscription> _subscriptions = [];
   var starService = Global.getIt<StarService>();
 
-  Star? star;
+  Rx<Star> star = Star().obs;
 
   final Map<EventType, String> _scripts = {
     EventType.toggle: kToggleVideoScript,
@@ -46,10 +48,14 @@ class _CustomWebviewState extends State<CustomWebview>
     super.initState();
     initPlatformState();
 
-    eventBus.on<GlobalEvent>().listen((e) {
-      if (_scripts.containsKey(e.type)) {
-        _controller.executeScript(_scripts[e.type]!);
+    eventBus.on<GlobalEvent>().listen((e) async {
+      if (!_scripts.containsKey(e.type)) {
+        return;
       }
+      if (!await WindowManagerHelper().isVisible()) {
+        return;
+      }
+      await _controller.executeScript(_scripts[e.type]!);
     });
   }
 
@@ -68,9 +74,9 @@ class _CustomWebviewState extends State<CustomWebview>
       _subscriptions.add(
         _controller.url.listen((url) {
           _textController.text = url;
-          if (star != null) {
-            star!.url = url;
-            starService.update(star!);
+          if (star.value.url != null) {
+            star.value.url = url;
+            starService.update(star.value);
           }
         }),
       );
@@ -91,7 +97,7 @@ class _CustomWebviewState extends State<CustomWebview>
       late String url;
       if (list.isNotEmpty) {
         url = list.first.url!;
-        star = list.first;
+        star.value = list.first;
       } else {
         url = kDefaultUrl;
       }
@@ -131,18 +137,18 @@ class _CustomWebviewState extends State<CustomWebview>
                         },
                       ),
                     ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Obx(() => Text('${star.value.id}')),
+                    ),
                     IconButton(
                       icon: const Icon(Icons.add),
                       splashRadius: 20,
                       onPressed: () async {
-                        if (_textController.text.isEmpty) {
-                          return;
-                        }
-                        await starService.add(
-                          Star()..url = _textController.text,
-                        );
+                        await starService.add(Star()..url = kDefaultUrl);
                         var list = await starService.list();
-                        star = list.last;
+                        star.value = list.last;
+                        await _controller.loadUrl(kDefaultUrl);
                         await showToast('添加成功');
                       },
                     ),
@@ -157,7 +163,7 @@ class _CustomWebviewState extends State<CustomWebview>
                           },
                         );
                         if (star != null) {
-                          this.star = star;
+                          this.star.value = star;
                           await _controller.loadUrl(star.url!);
                           await showToast('跳转成功');
                         }

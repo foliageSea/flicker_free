@@ -44,6 +44,7 @@ class _StarDialogState extends State<StarDialog> with AppMessageMixin {
             itemBuilder: (BuildContext context, int index) {
               var star = stars[index];
               return ListTile(
+                leading: Text('${star.id}'),
                 title: Text(
                   '${star.url}',
                   maxLines: 1,

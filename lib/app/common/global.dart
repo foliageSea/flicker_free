@@ -7,6 +7,8 @@ import 'package:flicker_free/app/locales/locales.dart';
 import 'package:flicker_free/db/database.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:window_manager/window_manager.dart';
+import 'package:windows_single_instance/windows_single_instance.dart';
 
 final EventBus eventBus = EventBus();
 
@@ -42,6 +44,7 @@ class Global {
 
     var windowManagerHelper = WindowManagerHelper();
     await windowManagerHelper.ensureInitialized();
+    await setSingleInstance([]);
 
     info('应用开始初始化');
     await initCommon();
@@ -73,5 +76,18 @@ class Global {
 
   static initAppVersion() {
     appVersion = PackageInfoUtil().getVersion();
+  }
+
+  /// windows设置单实例启动
+  static Future setSingleInstance(List<String> args) async {
+    await WindowsSingleInstance.ensureSingleInstance(
+      args,
+      Global.appName,
+      onSecondWindow: (args) async {
+        // 唤起并聚焦
+        if (await windowManager.isMinimized()) await windowManager.restore();
+        await windowManager.focus();
+      },
+    );
   }
 }

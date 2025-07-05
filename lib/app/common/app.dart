@@ -35,7 +35,7 @@ class _MainAppState extends State<MainApp> with AppLogMixin, WindowListener {
   Future<void> onWindowClose() async {
     bool isPreventClose = await windowManager.isPreventClose();
     if (isPreventClose && mounted) {
-      await windowManager.minimize();
+      await windowManager.hide();
     }
   }
 
