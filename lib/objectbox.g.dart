@@ -45,7 +45,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 7674592580460475959),
     name: 'Star',
-    lastPropertyId: const obx_int.IdUid(2, 3594464568380776343),
+    lastPropertyId: const obx_int.IdUid(3, 7637488358935429666),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -57,6 +57,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(2, 3594464568380776343),
         name: 'url',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7637488358935429666),
+        name: 'title',
         type: 9,
         flags: 0,
       ),
@@ -161,9 +167,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final urlOffset = object.url == null
             ? null
             : fbb.writeString(object.url!);
-        fbb.startTable(3);
+        final titleOffset = object.title == null
+            ? null
+            : fbb.writeString(object.title!);
+        fbb.startTable(4);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, urlOffset);
+        fbb.addOffset(2, titleOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -175,7 +185,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
           ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
           ..url = const fb.StringReader(
             asciiOptimization: true,
-          ).vTableGetNullable(buffer, rootOffset, 6);
+          ).vTableGetNullable(buffer, rootOffset, 6)
+          ..title = const fb.StringReader(
+            asciiOptimization: true,
+          ).vTableGetNullable(buffer, rootOffset, 8);
 
         return object;
       },
@@ -201,4 +214,9 @@ class Star_ {
 
   /// See [Star.url].
   static final url = obx.QueryStringProperty<Star>(_entities[1].properties[1]);
+
+  /// See [Star.title].
+  static final title = obx.QueryStringProperty<Star>(
+    _entities[1].properties[2],
+  );
 }

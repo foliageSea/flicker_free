@@ -30,11 +30,16 @@ dependencies:
   event_bus: ^2.0.1
   windows_single_instance: ^1.0.1
 
+
 dependency_overrides:
   core:
     path: ./packages/core
   updater:
     path: ./packages/updater
+  webview_windows:
+    git:
+      url: https://github.com/jnschulze/flutter-webview-windows.git
+      ref: main
 
 dev_dependencies:
   flutter_test:

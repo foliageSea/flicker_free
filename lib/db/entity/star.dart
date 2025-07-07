@@ -5,4 +5,5 @@ class Star {
   @Id()
   int id = 0;
   String? url;
+  String? title;
 }

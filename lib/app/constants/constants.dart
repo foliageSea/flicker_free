@@ -15,3 +15,5 @@ const kPreviousVideoScript =
 
 const kNextVideoScript =
     "document.querySelector('.bpx-player-ctrl-web-next')?.click()";
+
+const kDefaultSearchEngine = 'https://www.google.com/search?q=';

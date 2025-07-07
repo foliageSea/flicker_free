@@ -9,6 +9,7 @@ import 'package:flicker_free/app/events/events.dart';
 import 'package:flicker_free/app/helpers/hotkey_helper.dart';
 import 'package:flicker_free/app/helpers/window_manager_helper.dart';
 import 'package:flicker_free/app/widgets/star_dialog.dart';
+import 'package:flicker_free/app/widgets/tag.dart';
 import 'package:flicker_free/db/entity/star.dart';
 import 'package:flicker_free/db/services/star_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -74,8 +75,17 @@ class _CustomWebviewState extends State<CustomWebview>
       _subscriptions.add(
         _controller.url.listen((url) {
           _textController.text = url;
-          if (star.value.url != null) {
+          if (star.value.id != 0) {
             star.value.url = url;
+            starService.update(star.value);
+          }
+        }),
+      );
+
+      _subscriptions.add(
+        _controller.title.listen((title) {
+          if (star.value.id != 0) {
+            star.value.title = title;
             starService.update(star.value);
           }
         }),
@@ -92,15 +102,7 @@ class _CustomWebviewState extends State<CustomWebview>
         WebviewPopupWindowPolicy.sameWindow,
       );
 
-      var list = await starService.list();
-
-      late String url;
-      if (list.isNotEmpty) {
-        url = list.first.url!;
-        star.value = list.first;
-      } else {
-        url = kDefaultUrl;
-      }
+      var url = await _loadUrl();
       await _controller.loadUrl(url);
 
       if (!mounted) return;
@@ -110,142 +112,167 @@ class _CustomWebviewState extends State<CustomWebview>
     }
   }
 
-  Widget compositeView() {
+  Future<String> _loadUrl() async {
+    var list = await starService.list();
+    late String url;
+    if (list.isNotEmpty) {
+      url = list.first.url!;
+      star.value = list.first;
+    } else {
+      url = kDefaultUrl;
+    }
+    return url;
+  }
+
+  Widget _buildNavBar(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
+
+    if (width < 640) {
+      return const SizedBox.shrink();
+    }
+
+    return Card(
+      elevation: 0,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'URL',
+                contentPadding: EdgeInsets.all(10.0),
+              ),
+              textAlignVertical: TextAlignVertical.center,
+              controller: _textController,
+              onSubmitted: _handleSubmitUrl,
+            ),
+          ),
+          Obx(() => Tag('${star.value.id}')),
+          IconButton(
+            icon: const Icon(Icons.add),
+            splashRadius: 20,
+            onPressed: () async {
+              await starService.add(Star()..url = kDefaultUrl);
+              var list = await starService.list();
+              star.value = list.last;
+              await _controller.loadUrl(kDefaultUrl);
+              await showToast('添加成功');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.star_border),
+            splashRadius: 20,
+            onPressed: () async {
+              var star = await showDialog<Star>(
+                context: context,
+                builder: (BuildContext context) {
+                  return StarDialog(current: this.star.value);
+                },
+              );
+              if (star != null) {
+                this.star.value = star;
+                await _controller.loadUrl(star.url!);
+                await showToast('跳转成功');
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.keyboard_arrow_left),
+            splashRadius: 20,
+            onPressed: () {
+              _controller.goBack();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.keyboard_arrow_right),
+            splashRadius: 20,
+            onPressed: () {
+              _controller.goForward();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.fullscreen),
+            splashRadius: 20,
+            onPressed: () {
+              fireGlobalEvent(EventType.fullScreen);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            splashRadius: 20,
+            onPressed: () {
+              _controller.reload();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: 'Open DevTools',
+            splashRadius: 20,
+            onPressed: () async {
+              var result = await showOkCancelAlertDialog(
+                context: context,
+                title: '询问',
+                message: '是否退出应用?',
+              );
+
+              if (result != OkCancelResult.ok) {
+                return;
+              }
+              await HotkeyHelper().unregisterAll();
+
+              exit(0);
+            },
+          ),
+        ].insertSizedBoxBetween(width: 6),
+      ),
+    );
+  }
+
+  void _handleSubmitUrl(val) {
+    final uri = Uri.tryParse(val);
+    if (uri != null && uri.isAbsolute) {
+      _controller.loadUrl(val);
+    } else {
+      final encodedQuery = Uri.encodeComponent(val);
+      final searchUrl = '$kDefaultSearchEngine$encodedQuery';
+      _controller.loadUrl(searchUrl);
+    }
+  }
+
+  Widget _buildWebView() {
     if (!_controller.value.isInitialized) {
       return const CupertinoActivityIndicator();
-    } else {
-      return Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          children: [
-            if (width > 640)
-              Card(
-                elevation: 0,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          hintText: 'URL',
-                          contentPadding: EdgeInsets.all(10.0),
-                        ),
-                        textAlignVertical: TextAlignVertical.center,
-                        controller: _textController,
-                        onSubmitted: (val) {
-                          _controller.loadUrl(val);
-                        },
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Obx(() => Text('${star.value.id}')),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      splashRadius: 20,
-                      onPressed: () async {
-                        await starService.add(Star()..url = kDefaultUrl);
-                        var list = await starService.list();
-                        star.value = list.last;
-                        await _controller.loadUrl(kDefaultUrl);
-                        await showToast('添加成功');
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.star_border),
-                      splashRadius: 20,
-                      onPressed: () async {
-                        var star = await showDialog<Star>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const StarDialog();
-                          },
-                        );
-                        if (star != null) {
-                          this.star.value = star;
-                          await _controller.loadUrl(star.url!);
-                          await showToast('跳转成功');
-                        }
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.keyboard_arrow_left),
-                      splashRadius: 20,
-                      onPressed: () {
-                        _controller.goBack();
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.keyboard_arrow_right),
-                      splashRadius: 20,
-                      onPressed: () {
-                        _controller.goForward();
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.fullscreen),
-                      splashRadius: 20,
-                      onPressed: () {
-                        fireGlobalEvent(EventType.fullScreen);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      splashRadius: 20,
-                      onPressed: () {
-                        _controller.reload();
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.exit_to_app),
-                      tooltip: 'Open DevTools',
-                      splashRadius: 20,
-                      onPressed: () async {
-                        var result = await showOkCancelAlertDialog(
-                          context: context,
-                          title: '询问',
-                          message: '是否退出应用?',
-                        );
-
-                        if (result != OkCancelResult.ok) {
-                          return;
-                        }
-                        await HotkeyHelper().unregisterAll();
-
-                        exit(0);
-                      },
-                    ),
-                  ].insertSizedBoxBetween(width: 4),
-                ),
-              ),
-            Expanded(
-              child: Card(
-                color: Colors.transparent,
-                elevation: 0,
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                child: Stack(
-                  children: [
-                    Webview(_controller),
-                    StreamBuilder<LoadingState>(
-                      stream: _controller.loadingState,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData &&
-                            snapshot.data == LoadingState.loading) {
-                          return const LinearProgressIndicator();
-                        } else {
-                          return const SizedBox();
-                        }
-                      },
-                    ),
-                  ],
-                ),
+    }
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        children: [
+          _buildNavBar(context),
+          Expanded(
+            child: Card(
+              color: Colors.transparent,
+              elevation: 0,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: Stack(
+                children: [
+                  Webview(_controller),
+                  StreamBuilder<LoadingState>(
+                    stream: _controller.loadingState,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData &&
+                          snapshot.data == LoadingState.loading) {
+                        return const LinearProgressIndicator();
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      );
-    }
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -265,7 +292,7 @@ class _CustomWebviewState extends State<CustomWebview>
       //   },
       //   child: Icon(_isWebviewSuspended ? Icons.play_arrow : Icons.pause),
       // ),
-      body: Center(child: compositeView()),
+      body: Center(child: _buildWebView()),
     );
   }
 }
