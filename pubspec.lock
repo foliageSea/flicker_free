@@ -1379,11 +1379,9 @@ packages:
   webview_windows:
     dependency: "direct main"
     description:
-      path: "."
-      ref: main
-      resolved-ref: ed81bbe985c12759a44b9cca8170e19c73b961c0
-      url: "https://github.com/jnschulze/flutter-webview-windows.git"
-    source: git
+      path: "packages/webview_windows"
+      relative: true
+    source: path
     version: "0.4.0"
   win32:
     dependency: transitive
