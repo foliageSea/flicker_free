@@ -1,9 +1,11 @@
+import 'package:core/core.dart';
 import 'package:get/get.dart';
 import '../features/features.dart';
+import '../middlewares/middlewares.dart';
 part 'app_routes.dart';
 
 class AppPages {
-  static const initial = AppRoutes.home;
+  static const initial = AppRoutes.oobe;
 
   static Transition transition = Transition.cupertino;
 
@@ -13,10 +15,21 @@ class AppPages {
     GetPage(name: AppRoutes.login, page: () => const LoginPage()),
   ];
 
-  static List<String> whiteList = [];
+  static List<String> whiteList = [AppRoutes.oobe, AppRoutes.login];
+
+  static final List<GetPage<dynamic>> _routesCache = [];
 
   static List<GetPage<dynamic>> getRoutes() {
-    final List<GetMiddleware> middlewares = [];
+    if (_routesCache.isNotEmpty) {
+      return _routesCache;
+    }
+
+    var storage = Storage();
+
+    final List<GetMiddleware> middlewares = [
+      OobeMiddleware(storage: storage),
+      AuthMiddleware(storage: storage),
+    ];
 
     List<GetPage<dynamic>> result = [];
     for (var r in _routes) {
@@ -37,6 +50,17 @@ class AppPages {
         result.add(route);
       }
     }
-    return result;
+    _routesCache.add(
+      GetPage(
+        name: "/",
+        page: () => const RootPage(),
+        transition: transition,
+        participatesInRootNavigator: true,
+        preventDuplicates: true,
+        children: result,
+      ),
+    );
+
+    return _routesCache;
   }
 }
