@@ -113,15 +113,26 @@ class _CustomWebviewState extends State<CustomWebview>
   }
 
   Future<String> _loadUrl() async {
+    var id = Storage().get(StorageKeys.tag).parseInt(defaultValue: 0);
+
     var list = await starService.list();
     late String url;
     if (list.isNotEmpty) {
-      url = list.first.url!;
-      star.value = list.first;
+      if (id != 0 && list.any((e) => e.id == id)) {
+        var s = list.firstWhere((e) => e.id == id);
+        star.value = s;
+      } else {
+        star.value = list.first;
+      }
+      url = star.value.url!;
     } else {
       url = kDefaultUrl;
     }
     return url;
+  }
+
+  Future _cacheTag() async {
+    await Storage().set(StorageKeys.tag, star.value.id.toString());
   }
 
   Widget _buildNavBar(BuildContext context) {
@@ -155,6 +166,7 @@ class _CustomWebviewState extends State<CustomWebview>
               var list = await starService.list();
               star.value = list.last;
               await _controller.loadUrl(kDefaultUrl);
+              await _cacheTag();
               await showToast('添加成功');
             },
           ),
@@ -171,6 +183,7 @@ class _CustomWebviewState extends State<CustomWebview>
               if (star != null) {
                 this.star.value = star;
                 await _controller.loadUrl(star.url!);
+                await _cacheTag();
                 await showToast('跳转成功');
               }
             },

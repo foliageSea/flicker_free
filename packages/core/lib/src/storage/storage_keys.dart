@@ -6,4 +6,5 @@ enum StorageKeys {
   flexScheme,
   themeMode,
   locale,
+  tag,
 }
