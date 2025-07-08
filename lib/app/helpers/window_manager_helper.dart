@@ -22,6 +22,7 @@ class WindowManagerHelper {
     WindowOptions windowOptions = WindowOptions(
       size: sizeMap[WindowManagerSize.normal],
       center: true,
+      titleBarStyle: TitleBarStyle.hidden,
     );
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {

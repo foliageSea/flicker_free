@@ -14,7 +14,13 @@ class Tag extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
         color: Theme.of(context).primaryColorDark,
       ),
-      child: Center(child: Text(data, textAlign: TextAlign.center)),
+      child: Center(
+        child: Text(
+          data,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }

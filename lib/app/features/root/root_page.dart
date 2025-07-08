@@ -1,4 +1,5 @@
 import 'package:flicker_free/app/routes/app_pages.dart';
+import 'package:flicker_free/app/widgets/windows_frame.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -13,8 +14,12 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('root')),
-      body: GetRouterOutlet(initialRoute: AppPages.initial, anchorRoute: '/'),
+      body: WindowsFrame(
+        child: GetRouterOutlet(
+          initialRoute: AppPages.initial,
+          anchorRoute: '/',
+        ),
+      ),
     );
   }
 }

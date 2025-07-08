@@ -23,7 +23,7 @@ class ThemeController extends GetxService with AppLogMixin {
   };
 
   InputDecorationTheme inputDecorationTheme = const InputDecorationTheme(
-    border: OutlineInputBorder(),
+    border: OutlineInputBorder(borderSide: BorderSide.none),
   );
 
   ThemeData getThemeData() {
@@ -82,7 +82,7 @@ class ThemeController extends GetxService with AppLogMixin {
       flexSchemeMap[e.name] = e;
     }
 
-    var defaultScheme = findKeyByValue(flexSchemeMap, FlexScheme.blueM3)!;
+    var defaultScheme = findKeyByValue(flexSchemeMap, FlexScheme.pinkM3)!;
     var defaultThemeMode = findKeyByValue(themeModeMap, ThemeMode.dark)!;
 
     flexScheme.value = Storage()
